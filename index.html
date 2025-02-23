@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Club RoboDev</title>
+    <link href="/public/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/public/fontawesome/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+
+    <div class="container text-center">
+        <h2 class="section-title mb-4">Real-Time Data</h2>
+        <div class="table-responsive">
+		<div><b><u>Latest Data Recieved</u></b></div>
+            <div class="data">
+		<strong>Battery Level:</strong> <span id="battery">Loading...</span> %
+	    </div>
+	    <div class="data">
+		<strong>Distance:</strong> <span id="distance">Loading...</span> cm
+	    </div>
+	    <div class="data">
+		<strong>Panel Angel X:</strong> <span id="angelX">Loading...</span> °
+	    </div>
+	    <div class="data">
+		<strong>Panel Angel Y:</strong> <span id="angelY">Loading...</span> °
+	    </div>
+	    <div class="data">
+		<strong>Humidity:</strong> <span id="hum">Loading...</span> %
+	    </div>
+
+	    <div class="error" id="error"></div>
+        </div>
+    </div>
+
+    <div class="container text-center">
+        <h2 class="section-title mb-4">5 Latest Data</h2>
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped table-light">
+                <thead>
+                    <tr>
+                        <th scope="col">Battery Level (%)</th>
+                        <th scope="col">Distance (cm)</th>
+                        <th scope="col">Panel Angel X (°)</th>
+                        <th scope="col">Panel Angel Y (°)</th>
+                        <th scope="col">Humidity (%)</th>
+                    </tr>
+                </thead>
+                <tbody id="data-table-body">
+                   
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+<script>
+    function fetchData() {
+        fetch('http://YourBackendIpAndPort/api/data/liste')
+            .then(response => response.json())
+            .then(data => {
+
+                const lastFiveItems = data.slice(-5).reverse();
+                const tableBody = document.getElementById('data-table-body');
+                tableBody.innerHTML = '';
+                lastFiveItems.forEach(item => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${item.battery_lvl}</td>
+                        <td>${item.distance}</td>
+                        <td>${item.angel_panneau_x}</td>
+                        <td>${item.angel_panneau_y}</td>
+                        <td>${item.humidite_sol}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    }
+    document.addEventListener('DOMContentLoaded', fetchData);
+</script>
+
+<script>
+
+function fetchLiveData() {
+    $.ajax({
+        url: 'http://YouBackendIpAndPort/api/data/stream',
+        type: 'GET',
+        success: function(response) {
+
+            $('#battery').text(response.battery_lvl || 'Battery not available');
+            $('#distance').text(response.distance || 'Distance not available');
+            $('#angelX').text(response.angel_panneau_x || 'Angel X not available');
+	    $('#angelY').text(response.angel_panneau_y || 'Angel Y not available');
+            $('#hum').text(response.humidite_sol || 'Humidity not available');
+        },
+        error: function(xhr, status, error) {
+            console.error('Error fetching live data:', error);
+            $('#error').text('');
+        }
+    });
+}
+
+setInterval(fetchLiveData, 2000);
+
+$(document).ready(fetchLiveData);
+
+</script>
+
+</body>
+</html>
+
