@@ -9,7 +9,7 @@ const char* serverUrl = "http://YourBackendIpAndPort/api/data/add";
 
 #define TRIG_PIN 32
 #define ECHO_PIN 33
-#define SOIL_SENSOR_PIN 34
+#define SOIL_SENSOR_PIN 31
 #define WATER_PUMP_PIN 25
 #define IRRIGATION_PUMP_PIN 26
 #define BATTERY_PIN 34
